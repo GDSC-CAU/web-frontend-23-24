@@ -1,9 +1,14 @@
 # 목차
-- [Singleton Pattern](#singleton-pattern)
-- [Proxy Pattern](#proxy-pattern)
-- [Provider Pattern](#provider-pattern)
-- [Prototype Pattern](#prototype-pattern)
-- [Presentational and Container Pattern](#presentational-and-container-pattern)
+1. [Introduction](#introduction)
+2. [Singleton Pattern](#singleton-pattern)
+3. [Proxy Pattern](#proxy-pattern)
+4. [Provider Pattern](#provider-pattern)
+5. [Prototype Pattern](#prototype-pattern)
+6. [Presentational and Container Pattern](#presentational-and-container-pattern)
+
+# Introduction
+웹 개발에서 사용할 수 있는 다양한 디자인 패턴을 공부합니다.
+참고 사이트: https://patterns-dev-kr.github.io
 
 # Singleton Pattern
 Singleton Pattern은 여러 인스턴스를 만들 수 없도록 하여 단 하나의 유일한 객체를 만들기 위한 코드 패턴이다. 객체에 하나의 인스턴스만 허용하고, 만들어진 인스턴스를 앱 전역에서 공유할 수 있도록 한다. 
