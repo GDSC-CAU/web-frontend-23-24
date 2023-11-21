@@ -107,6 +107,13 @@ Provider 패턴을 과하게 사용할 경우 특정 상황에서 성능 이슈�
 
 
 # Mixin Pattern
+Mixin Pattern은 객체나 클래스에 상속 없이 재사용할 수 있는 기능을 추가하는 코드 패턴이다. 일종의 다중상속(클래스가 여러 상위 클래스로부터 상속받는 기능)과 같다고 할 수 있는데, 객체의 일정 부분을 쪼개어 조립하는 형태라고 보는 것이 좋다. 
+
+Javascript는 단일상속만을 허용하는 언어로, 하나의 Prototype만을 가지며 클래스는 하나의 클래스만 상속받을 수 있다. Mixin은 단독으로 사용되지 않고 여러 객체의 메서드(혹은 프로퍼티)를 조합하는 것을 말한다. Javascript에서는 `Object.assign` 메서드를 사용하여 mixin을 구현한다. Mixin이 기존 클래스의 메서드를 덮어쓸 경우 충돌이 발생할 수 있기 때문에 충돌이 발생하지 않도록 메서드 이름을 작성해야 한다. 
+
+## 예시
+`Window` 객체는 `WindowOrWorkerGlobalScope`와 `WindowEventHandler`의 mixin으로 구성되어 있어 다양한 메서드를 사용할 수 있다. 하지만 해당 mixin을 직접 사용할 수는 없다.
+React에서는 Higher Order Component 혹은 Hooks를 사용하여 기능을 추가할 수 있으며 mixin으로 인해 발생하는 복잡도 증가와 재사용성 감소 때문에 mixin 사용을 권장하지 않는다. 
 
 
 # Mediator/Middleware Pattern
