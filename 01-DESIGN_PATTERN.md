@@ -5,10 +5,23 @@
 4. [Provider Pattern](#provider-pattern)
 5. [Prototype Pattern](#prototype-pattern)
 6. [Presentational and Container Pattern](#presentational-and-container-pattern)
+7. [Observer Pattern](#observer-pattern)
+8. [Module Pattern](#module-pattern)
+9. [Mixin Pattern](#mixin-pattern)
+10. [Mediator/Middleware Pattern](#mediatormiddleware-pattern)
+11. [HOC Pattern](#hoc-pattern)
+12. [Render Props Pattern](#render-props-pattern)
+13. [Hooks Pattern](#hooks-pattern)
+14. [Flyweight Pattern](#flyweight-pattern)
+15. [Factory Pattern](#factory-pattern)
+16. [Compound Pattern](#compound-pattern)
+17. [Command Pattern](#command-pattern)
+
 
 # Introduction
 웹 개발에서 사용할 수 있는 다양한 디자인 패턴을 공부합니다.
 참고 사이트: https://patterns-dev-kr.github.io
+
 
 # Singleton Pattern
 Singleton Pattern은 여러 인스턴스를 만들 수 없도록 하여 단 하나의 유일한 객체를 만들기 위한 코드 패턴이다. 객체에 하나의 인스턴스만 허용하고, 만들어진 인스턴스를 앱 전역에서 공유할 수 있도록 한다. 
@@ -27,6 +40,7 @@ Singleton Pattern은 객체를 사용할 때 새로운 인스턴스를 만들지
 ## 예시
 대표적인 예시로는 데이터베이스 연결, 네트워크 통신, 캐시, 로그 기록 객체 등이 있다.
 
+
 # Proxy Pattern
 Proxy Pattern은 어떤 객체를 직접 다루는 것이 아니라 Proxy 객체를 통해 객체의 값을 설정하거나 조회할 때 인터랙션을 제어할 수 있다. 
 
@@ -40,6 +54,7 @@ Proxy Pattern은 어떤 객체를 직접 다루는 것이 아니라 Proxy 객체
 [Observer Pattern | 개발자 황준일](https://junilhwang.github.io/TIL/Javascript/Design/Vanilla-JS-Store/#_1-최적화)
 
 Observer Pattern을 구현할 때, 이 Proxy 객체를 사용하여 구현하는 방법도 있다. 추가로 [Vue3](https://vuejs.org/guide/extras/reactivity-in-depth.html#How-Reactivity-Works-in-Vue#how-reactivity-works-in-vue), MobX에서 반응형 시스템(상태를 바꾸면 UI가) 또한, Proxy 객체로 구현이 되어있다. ([0.7KB로 Vue와 같은 반응형 시스템 만들기-NHN Cloud](https://meetup.nhncloud.com/posts/188))
+
 
 # Provider Pattern
 앱 내부의 다양한 컴포넌트에서 같은 데이터를 사용해야하는 경우가 있다. 이 때, 동일한 데이터를 사용하는 컴포넌트가 모두 포함되는 상위 컴포넌트에서 데이터를 `props`를 통해서 전달하는 방식을 사용할 수 있다. 
@@ -58,6 +73,7 @@ Provider 패턴을 과하게 사용할 경우 특정 상황에서 성능 이슈�
 따라서 Provider 패턴을 사용할 경우, 성능 저하를 방지하기 위해 여러 Provider로 쪼개어 사용하는 것이 좋다. (상태값 & 액션 등) 하지만 이러한 방식으로 사용시 너무 많은 Provider로 감싸야 하는 Provider Hell이라는 안티패턴이 등장하게 된다. 
 **전역 상태관리 라이브러리**를 사용하는 이유는 이러한 안티패턴을 방지하고 하나의 Provider로 데이터를 전달하기 위함도 있다고 생각한다. Context API
 
+
 # Prototype Pattern
 자바스크립트는 동일 타입의 여러 객체들이 프로퍼티를 공유할 때, 중복된 프로퍼티들이 존재하는 인스턴스를 매번 생성하는 것이 아니라 Prototype Chain을 통해서 연결되어 중복된 프로퍼티는 Prototype에서 가져온다. Prototype에 프로퍼티를 추가하면 모든 인스턴스가 Prototype 객체를 활용할 수 있다. **일종의 상속 기능이라고 볼 수 있다.**
 
@@ -67,6 +83,7 @@ Provider 패턴을 과하게 사용할 경우 특정 상황에서 성능 이슈�
 
 그렇다면 프로토타입은 단순히 자바스크립트에서 상속을 지원하기 위해서 사용되는 방법일까? 생각해보자.
 추천글 : [자바스크립트는 왜 프로토타입을 선택했을까](https://medium.com/@limsungmook/자바스크립트는-왜-프로토타입을-선택했을까-997f985adb42)
+
 
 # Presentational and Container Pattern
 > Presentational and Container Pattern을 처음으로 제시했던 Dan Abramov는 더 이상 이 패턴을 사용하여 컴포넌트를 분할하는 것이 좋지 않다고 말합니다. 
@@ -81,3 +98,37 @@ Provider 패턴을 과하게 사용할 경우 특정 상황에서 성능 이슈�
 ### 단점
 - 현재는 Hook을 사용하여 비즈니스 로직을 분리할 수 있어 사용하지 않는 것이 좋다.
 - Hook을 사용하여 관심사를 분리하더라도 너무 작은 앱에서는 오버엔지니어링일 수 있다.
+
+
+# Observer Pattern
+
+
+# Module Pattern
+
+
+# Mixin Pattern
+
+
+# Mediator/Middleware Pattern
+
+
+# HOC Pattern
+
+
+# Render Props Pattern
+
+
+# Hooks Pattern
+
+
+# Flyweight Pattern
+
+
+# Factory Pattern
+
+
+# Compound Pattern
+
+
+# Command Pattern
+
