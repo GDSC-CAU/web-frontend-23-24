@@ -287,6 +287,122 @@ Mediator/Middleware Pattern은 컴포넌트들간 직접적인 통신 대신, �
 
 # Render Props Pattern
 
+여러 컴포넌트가 동일한 데이터나 동일한 로직을 포함해야 할 때 **재사용 가능한 컴포넌트 용이**
+**컴포넌트를 재사용할 수 있는 방법 중 하나 →** `render props`
+**JSX 엘리먼트를 props를 통해 컴포넌트에게 전달한다**
+Title컴포넌트는 render props만 바꿔가며 여러번 사용할 수 있다.
+아래 코드를 보면 Title의 render라는 이름으로 props에 넘어간다.
+Title 컴포넌트에서 props.render() 를 실행하면 **넘어간 함수가 실행되면서 jsx 를 반환한다.**
+
+```jsx
+import React from 'react';
+import { render } from 'react-dom';
+import './styles.css';
+
+const Title = (props) => props.render();
+
+render(
+  <div className='App'>
+    <Title render={() => <h1>✨ First render prop! ✨</h1>} />
+    <Title render={() => <h2>🔥 Second render prop! 🔥</h2>} />
+    <Title render={() => <h3>🚀 Third render prop! 🚀</h3>} />
+  </div>,
+  document.getElementById('root')
+);
+```
+
+즉 아래와 같은 코드로 변환된다.
+
+```jsx
+import React from 'react';
+import { render } from 'react-dom';
+import './styles.css';
+
+render(
+  <div className='App'>
+    <h1>✨ First render prop! ✨</h1>
+    <h2>🔥 Second render prop! 🔥</h2>
+    <h3>🚀 Third render prop! 🚀</h3>
+  </div>,
+  document.getElementById('root')
+);
+```
+
+단지 함수를 호출하는 것 대신 render prop 함수를 호출할 때 인자를 전달할 수 있다.
+근데 여러 컴포넌트에서 동일한 값을 보여줘야 할땐 **부모 컴포넌트로 상태를 끌어올려** state를 props로 넘기는 게 편하다.
+
+```jsx
+function Input({ value, handleChange }) {
+  return <input value={value} onChange={e => handleChange(e.target.value)} />
+}
+
+export default function App() {
+  const [value, setValue] = useState('')
+  return (
+			...
+      <Input value={value} handleChange={setValue} />
+      <Kelvin value={value} />
+			...
+	)
+}
+
+```
+
+컴포넌트가 여러 자식 컴포넌트를 가지고 있는 경우 **처리 어려움**
+상태의 변경은 **모든 자식 컴포넌트의 리렌더링을 유발**할 수 있고 **앱의 전체적인 성능을 떨어트릴 수 있음**
+
+# 단점
+
+첫번째 단점은 트리가 깊어진다는 것
+
+```jsx
+<Mutation mutation={FIRST_MUTATION}>
+  {firstMutation => (
+    <Mutation mutation={SECOND_MUTATION}>
+      {secondMutation => (
+        <Mutation mutation={THIRD_MUTATION}>
+          {thirdMutation => (
+            <ElementfirstMutation={firstMutation}secondMutation={secondMutation}thirdMutation={thirdMutation}/>)}
+        </Mutation>)}
+    </Mutation>)}
+</Mutation>
+
+```
+
+아래와 같이 hooks 를 통해 이를 해결할 수 있다.
+
+```jsx
+import React, { useState } from 'react';
+import './styles.css';
+
+import { useMutation } from '@apollo/react-hooks';
+import { ADD_MESSAGE } from './resolvers';
+
+export default function Input() {
+  const [message, setMessage] = useState('');
+  const [addMessage] = useMutation(ADD_MESSAGE, {
+    variables: { message },
+  });
+
+  return (
+    <div className='input-row'>
+      <input
+        onChange={(e) => setMessage(e.target.value)}
+        type='text'
+        placeholder='Type something...'
+      />
+      <button onClick={addMessage}>Add</button>
+    </div>
+  );
+}
+```
+
+# 장점
+
+**render prop을 사용하여 컴포넌트간 데이터 공유 편리**
+`children prop` 로 해당 컴포넌트를 재사용할 수 있다.
+render props를 활용하여 렌더링 컴포넌트와 앱의 로직을 분리할 수 있다.
+
 # Hooks Pattern
 
 # Flyweight Pattern
