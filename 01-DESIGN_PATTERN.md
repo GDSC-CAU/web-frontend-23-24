@@ -606,9 +606,171 @@ render props를 활용하여 렌더링 컴포넌트와 앱의 로직을 분리�
 # Hooks Pattern
 
 # Flyweight Pattern
+<aside>
+💡 동일한 객체를 다룰 때 이미 존재하는 인스턴스를 재사용한다
+
+</aside>
+
+- 비슷한 객체를 대량으로 만들어야 할 때 메모리를 절약할 수 있게 해 주는 유용한 패턴이다.
+- ex) 책을 추가할 수 있는 앱
+    
+    → 매번 동일한 책에 대핸 새로운 클래스를 생성하는 것은 비효율적 → 하나의 책을 의미하는 `Book` 클래스의 인스턴스를 여러개 만듦
+    
+    ```jsx
+    class Book {
+      constructor(title, author, isbn) {
+        this.title = title
+        this.author = author
+        this.isbn = isbn
+      }
+    }
+    ```
+    
+    when, 리스트에 새로운 책을 추가하고 싶을 때.
+    
+    ```cpp
+    const createBook = (title, author, isbn) => {
+      const existingBook = books.has(isbn)
+    
+      if (existingBook) {
+        return books.get(isbn)
+      }
+    
+      const book = new Book(title, author, isbn)
+      books.set(isbn, book)
+    
+      return book
+    }
+    ```
+    
+    when, 같은 책을 여러개 추가할 경우.
+    사본을 추가할 때마다 `Book` 인스턴스를 새로 만드는 대신 이미 존재하는 책일 경우 해당 인스턴스를 재사용한다.
+    
+    ```cpp
+    const bookList = []
+    
+    const addBook = (title, author, isbn, availability, sales) => {
+      const book = {
+        ...createBook(title, author, isbn),
+        sales,
+        availability,
+        isbn,
+      }
+    
+      bookList.push(book)
+      return book
+    }|
+    ```
+    
+    ## 장점
+    
+    - 대량의 객체를 만들어 낼 때 메모리를 많이 사용하는 문제를 해결할 수 있다. 메모리 사용량을 최소화할 수도 있는 것이다.
+- But, 자바스크립트에서 [프로토타입 상속](https://patterns-dev-kr.github.io/design-patterns/prototype-pattern/)을 통해서도 비슷한 효과를 낼 수 있다 보니 이 패턴은 그리 크게 중요하지 않게 되었다.
 
 # Factory Pattern
 
 # Compound Pattern
 
 # Command Pattern
+<aside>
+💡 명령을 처리하는 객체를 통해 메서드와 실행되는 동작의 결합도를 낮출 수 있다
+
+</aside>
+
+- **특정 작업을 실행하는 개체**와 **메서드를 호출하는 개체**를 분리할 수 있다.
+
+Ex) 온라인 음식 배달 플랫폼
+
+```cpp
+class OrderManager() {
+  constructor() {
+    this.orders = []
+  }
+
+//주문
+  placeOrder(order, id) {
+    this.orders.push(id)
+    return `You have successfully ordered ${order} (${id})`;
+  }
+
+//주문한 음식이 어디쯤 왔나
+  trackOrder(id) {
+    return `Your order ${id} will arrive in 20 minutes.`
+  }
+
+//주문 취소
+  cancelOrder(id) {
+    this.orders = this.orders.filter(order => order.id !== id)
+    return `You have canceled your order ${id}`
+  }
+}
+```
+
+when, 보통 직접 사용할 때
+
+```cpp
+const manager = new OrderManager()
+
+manager.placeOrder('Pad Thai', '1234')
+manager.trackOrder('1234')
+manager.cancelOrder('1234')
+
+```
+
+→ 나중에 특정 메서드의 이름/기능을 변경해야 하는 경우 앱 규모가 커지면 변경하기 까다로움
+
+---
+
+[Refactoring]
+
+```cpp
+class OrderManager {
+  constructor() {
+    this.orders = []
+  }
+
+  execute(command, ...args) {
+    return command.execute(this.orders, ...args)
+  }
+}
+```
+
+- `placeOrder`, `trackOrder`, `cancelOrder`를 직집 구현하는 대신 `execute`라는 하나의 메서드만 가지도록 한다. 이 메서드는 인자로 주어진 어떤 명령이든 실행할 수 있다.
+- 각 명령은 첫 번째 인자로 `OrderManager`의 `orders` 배열을 넘겨 접근할 수 있도록 한다.
+
+```cpp
+class Command {
+  constructor(execute) {
+    this.execute = execute
+  }
+}
+
+function PlaceOrderCommand(order, id) {
+  return new Command(orders => {
+    orders.push(id)
+    return `You have successfully ordered ${order} (${id})`
+  })
+}
+
+function CancelOrderCommand(id) {
+  return new Command(orders => {
+    orders = orders.filter(order => order.id !== id)
+    return `You have canceled your order ${id}`
+  })
+}
+
+function TrackOrderCommand(id) {
+  return new Command(() => `Your order ${id} will arrive in 20 minutes.`)
+}
+```
+
+이로써 `OrderManager`가 메서드를 직접 갖는 대신 `execute`메서드를 통해 분리된 함수를 사용하도록 코드를 리펙토링하였다.
+
+## 장점
+
+- 객체와 메서드를 분리할 수 있게 해 준다.
+- 수명이 지정된 명령을 만들거나, 명령들을 큐에 담아 특정한 시간대에 처리하는 것도 가능해진다.
+
+## 단점
+
+- 쓸만한 상황이 딱히 많지 않고 종종 불필요한 코드가 만들어지곤 한다.
