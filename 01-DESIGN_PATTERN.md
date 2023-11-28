@@ -284,6 +284,206 @@ Mediator/Middleware Pattern은 컴포넌트들간 직접적인 통신 대신, �
 > - 중간에서 요청을 받아 작용하는 중재 역할을 하는 측면에서는 [Proxy Pattern](#proxy-pattern)과 유사하다. 하지만 Proxy Pattern은 객체에 대한 접근을 제어하거나 추가적인 작업을 수행할 때 사용하는 패턴으로 한 객체를 wrapping하여 제어하거나 보호할 때 사용하는 반면에, Mediator/Middleware Pattern은 여러 객체를 연결하는 역할로 객체간의 상호작용을 조정하고 관리하는데 사용한다.
 
 # HOC Pattern
+<aside>
+💡 HOC(Higher Order Component) ; 앱 전반적으로 재사용 가능한 로직을 prop으로 컴포넌트에게 제공한다
+
+</aside>
+
+- 종종 여러 컴포넌트에서 같은 로직을 사용해야 하는 경우가 있다
+ex) 컴포넌트의 스타일시트를 설정 / 권한 요청 / 전역상태 추가
+
+## HOC패턴
+
+- [같은 로직을 여러 컴포넌트에서 재사용하는 방법]
+    
+    → 고차 컴포너트 패턴활용 === HOC 
+    
+    - cf) 고차 컴포넌트 : 다른 컴포넌트를 받는 컴포넌트
+- HOC는 인자로 넘긴 컴포넌트에게 추가되길 원하는 로직을 가지고 있다. HOC는 로직이 적용된 element를 반환하게 된다.
+    
+    ```cpp
+    function withStyles(Component) {
+      return props => {
+        const style = { padding: '0.2rem', margin: '1rem' }
+        return <Component style={style} {...props} />
+      }
+    }//HOC
+    
+    //고차 컴포넌트
+    const Button = () = <button>Click me!</button>
+    const Text = () => <p>Hello World!</p>
+    
+    const StyledButton = withStyles(Button)
+    const StyledText = withStyles(Text)
+    ```
+    
+    : 여러 컴포넌트에게 동일한 스타일을 적용하고 싶다고 가정하자. 로컬 스코프에 `style` 객체를 직접 만드는 대신, HOC가 `style` 객체를 만들어 컴포넌트에게 전달하도록 한다.
+    
+
+## Composing
+
+- 여러 고차 컴포넌트를 조합할 수도 있다.
+
+아래 예제에서는 `withLoader`HOC에 `withHover` HOC를 사용하고 있다.
+
+[DogImages.js]
+
+```cpp
+
+import React from "react";
+import withLoader from "./withLoader";
+import withHover from "./withHover";
+
+function DogImages(props) {
+  return (
+    <div {...props}>
+      {props.hovering && <div id="hover">Hovering!</div>}
+      <div id="list">
+        {props.data.message.map((dog, index) => (
+          <img src={dog} alt="Dog" key={index} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export default withHover(
+  withLoader(DogImages, "https://dog.ceo/api/breed/labrador/images/random/6")
+);
+```
+
+[withLoader.js]
+
+```cpp
+import React, { useEffect, useState } from "react";
+
+export default function withLoader(Element, url) {
+  return props => {
+    const [data, setData] = useState(null);
+
+    useEffect(() => {
+      fetch(url)
+        .then(res => res.json())
+        .then(data => setData(data));
+    }, []);
+
+    if (!data) {
+      return <div>Loading...</div>;
+    }
+
+    return <Element {...props} data={data} />;
+  };
+}
+```
+
+[withHover.js]
+
+```cpp
+import React, { useState } from "react";
+
+export default function withHover(Element) {
+  return props => {
+    const [hovering, setHover] = useState(false);
+
+    return (
+      <Element
+        {...props}
+        hovering={hovering}
+        onMouseEnter={() => setHover(true)}
+        onMouseLeave={() => setHover(false)}
+      />
+    );
+  };
+}
+```
+
+## Hooks
+
+- 몇몇 상황에서는 HOC패턴은 React의 훅으로 대체할 수 있다.
+
+[userHover.js]
+
+```cpp
+import { useState, useRef, useEffect } from "react";
+
+export default function useHover() {
+  const [hovering, setHover] = useState(false);
+  const ref = useRef(null);
+
+  const handleMouseOver = () => setHover(true);
+  const handleMouseOut = () => setHover(false);
+
+  useEffect(() => {
+    const node = ref.current;
+    if (node) {
+      node.addEventListener("mouseover", handleMouseOver);
+      node.addEventListener("mouseout", handleMouseOut);
+
+      return () => {
+        node.removeEventListener("mouseover", handleMouseOver);
+        node.removeEventListener("mouseout", handleMouseOut);
+      };
+    }
+  }, [ref.current]);
+
+  return [ref, hovering];
+}
+```
+
+[DogImges.js]
+
+```cpp
+import React from "react";
+import withLoader from "./withLoader";
+import useHover from "./useHover";
+
+function DogImages(props) {
+  const [hoverRef, hovering] = useHover();
+
+  return (
+    <div ref={hoverRef} {...props}>
+      {hovering && <div id="hover">Hovering!</div>}
+      <div id="list">
+        {props.data.message.map((dog, index) => (
+          <img src={dog} alt="Dog" key={index} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export default withLoader(
+  DogImages,
+  "https://dog.ceo/api/breed/labrador/images/random/6"
+);
+```
+
+- 일반적으로 React의 훅은 HOC패턴을 완전 대체할 수 없다.
+    - **Hook** :
+        - 장점
+            - 트리가 깊어지는 상황을 줄일 수 있다.
+                
+                 → 컴포넌트를 래핑하지 않아도 되니까.
+                
+            - 컴포넌트의 내부에서 특정한 동작을 추가할 수 있게 해 준다
+        - 단점
+            - HOC에 비해 버그를 발생시킬 확률을 증가시킨다.
+        - [사용사례]
+            - 공통 기능이 각 컴포넌트에서 쓰이기 전에 커스터마이징 되어야 하는 경우
+            - 공통 기능이 앱 전반적으로 쓰이는 것이 아닌 하나나 혹은 몇개의 컴포넌트에서 요구되는 경우
+            - 해당 기능이 기능을 쓰는 컴포넌트에게 여러 프로퍼티를 전달해야 하는 경우
+    - **HOC :**
+        - 장점
+            - 동일한 로직을 한 군데 구현하여 여러 컴포넌트에 제공할 수 있다
+            - 동일 구현을 여러군데에 직접 구현하며 버그를 만들어 낼 확률을 줄일 수 있다.
+            - 로직을 한 곳에서 관리하여 코드를 DRY 하면서 관심사의 분리도 적용할 수 있게 되었다.
+        - 단점
+            - 트리가 깊어지는 경향이 있다.
+            - HOC가 반환하는 컴포넌트에 전달하는 props 의 이름이 겹칠 수 있다.
+            - HOC를 여러번 조합하여 사용하는 경우 모든 prop이 안에서 병합되므로 어떤 HOC가 어떤 props에 관련이 있는지 파악하기가 어렵다. 앱의 디버깅이나 규모를 키울 때 방해가 될 수 있다.****
+        - [사용사례]
+            - 앱 전반적으로 동일하며 커스터마이징 불가한 동작이 여러 컴포넌트에 필요한 경우
+            - 컴포넌트가 커스텀 로직 추가 없이 단독으로 동작할 수 있어야 하는 경우
 
 # Render Props Pattern
 
