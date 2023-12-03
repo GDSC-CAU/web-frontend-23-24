@@ -604,6 +604,59 @@ export default function Input() {
 render props를 활용하여 렌더링 컴포넌트와 앱의 로직을 분리할 수 있다.
 
 # Hooks Pattern
+> [!Warning]
+> 엄밀히 말하자면 Hooks는 디자인 패턴에 포함되지 않을 수 있다. 하지만 React 16.8버전에서 추가된 Hooks는 많은 디자인 패턴들이 Hooks로 대체될 수 있다.
+
+## 클래스형 컴포넌트
+Hooks 추가 이전 React에서 상태와 생명주기 함수를 사용하려면 클래스형 컴포넌트를 사용해야 했다. 클래스형 컴포넌트를 사용할 경우, 다음과 같은 단점이 존재한다.
+- 클래스형 컴포넌트는 ES6의 클래스 문법을 알아야 하기 때문에 러닝커브가 높다.
+- HOC 패턴이나 Render Prop 패턴으로 인해서 Wrapper가 많아지면서 구조를 파악하기 어려워진다.
+- 클래스형 컴포넌트에 로직을 추가할 때, 코드의 중복이 많아지며 컴포넌트의 크기가 빠르게 증가한다. 
+## Hooks
+클래스형 컴포넌트를 개발할 때 겪는 문제들을 해결하기 위해 Hooks가 추가되었다. 현재 React 18.2버전을 기준으로 `useState`, `useEffect`, `useRef`, `useContext`를 포함해 총 15개의 Built-in Hooks를 지원하고 있다. 
+Hooks를 사용하면 코드를 더 간결하게 작성할 수 있다. 상태를 가진 로직을 재사용할 수 있으며, HOC 패턴 혹은 render prop 패턴에 의해 발생하는 컴포넌트 복잡도 증가를 해결할 수 있다.
+### useState
+`useState`는 함수형 컴포넌트에서 상태를 관리할 수 있도록 한다. `useState`는 초기값을 parameter로 받으며, 상태의 현재값과 상태를 업데이트하는 함수를 담은 배열은 반환한다. 
+```jsx
+const [name, setName] = useState(initialValue)
+```
+
+### useEffect
+`useEffect` 훅을 사용하면, 컴포넌트의 생명주기를 가로챌 수 있다. `componentDidMount`, `componentDidUpdate`, `componentWillUnmount`에 해당하는 효과를 낼 수 있다. 
+`useEffect`는 첫번째 parameter로 실행할 함수, 두번째 parameter로 의존성 배열을 받는다.
+#### componentDidMount
+의존성 배열로 빈 배열을 사용하면 `componentDidMount`와 동일한 생명주기를 가진다. 컴포넌트가 마운트될 때 실행된다. 
+```jsx
+componentDidMount() { ... }
+useEffect(() => { ... },[])
+```
+
+#### componentWillUnmount
+의존성 배열을 빈 배열로 사용하면서 첫번째 parameter 함수의 반환값을 함수로 설정할 경우 `componentWillUnmount`와 동일한 생명주기를 가진다. 컴포넌트가 마운트 해제될 때, 첫번째 parameter인 실행 함수의 return 값에 해당하는 함수를 실행한다.
+```jsx
+componentWillUnmount() { ... }
+useEffect(() => { return () => { ... } }, [])
+```
+#### componentDidUpdate
+의존 배열에 담겨있는 값이 변경될 때마다 첫번째 parameter의 함수가 실행된다. 이는 `componentDidUpdate`와 동일한 생명주기를 가진다. 
+```jsx
+componentDidUpdate() { ... }
+useEffect(() => { ... }, [])
+```
+
+### Custom Hooks
+React의 Built-In Hooks 외에도 Custom Hooks를 직접 만들어 로직을 재사용할 수 있다. [모든 Hooks의 이름은 항상 `use`로 시작해야한다.](https://react.dev/learn/reusing-logic-with-custom-hooks#hook-names-always-start-with-use) 
+
+**예시**
+```jsx
+function useCounter() {
+    const [count, setCount] = useState(0);
+    const increment = () => setCount(count + 1);
+    const decrement = () => setCount(count - 1);
+    
+    return { count, increment, decrement };
+}
+```
 
 # Flyweight Pattern
 <aside>
